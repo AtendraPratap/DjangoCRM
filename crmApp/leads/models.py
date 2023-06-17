@@ -12,13 +12,19 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.username
+        return self.user.username
 
 class Lead(models.Model):
     first_name = models.CharField(max_length=200)
     last_name = models.CharField(max_length=200)
     age = models.IntegerField(default=0)
-    agent = models.ForeignKey("Agent", on_delete=models.CASCADE)
+    organisation = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    agent = models.ForeignKey("Agent", null=True, blank=True, on_delete=models.SET_NULL)
+    category = models.ForeignKey("Category", related_name="leads", null=True, blank=True, on_delete=models.SET_NULL)
+    description = models.TextField()
+    date_added = models.DateTimeField(auto_now_add=True)
+    phone_number = models.CharField(max_length=20)
+    email = models.EmailField()
 
  
     def __str__(self):
@@ -31,6 +37,14 @@ class Agent(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+
+class Category(models.Model):
+    name = models.CharField(max_length=200)
+    organisation = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
     
 
 def post_user_created_signal(sender, instance, created, **kwargs):
